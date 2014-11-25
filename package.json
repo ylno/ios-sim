@@ -25,6 +25,7 @@
   "license": "MIT",
   "dependencies": {
       "simctl": "^0.0.3",
-      "nopt": "1.0.9"
+      "nopt": "1.0.9",
+      "bplist-parser" : "^0.0.6"
   }
 }

@@ -23,8 +23,10 @@ THE SOFTWARE.
 */
 
 var path = require('path'),
+    fs = require('fs'),
     help = require('./help'),
-    simctl;
+    simctl,
+    bplist;
 
 var command_lib = {
     
@@ -36,6 +38,10 @@ var command_lib = {
         if (output.code !== 0) {
             console.error(output.output);
             process.exit(2);
+        }
+        
+        if (!bplist) {
+            bplist = require('bplist-parser');
         }
     },
     
@@ -54,7 +60,8 @@ var command_lib = {
             device = null,
             app_identifier = null,
             argv = [],
-            app_path = null;
+            app_path = null,
+            info_plist_path = null;
 
         if (args.argv.remain.length < 2) {
             help();
@@ -62,12 +69,33 @@ var command_lib = {
         }
         
         app_path = args.argv.remain[1];
-        argv = args.args;
+        info_plist_path = path.join(app_path,'Info.plist');
+        if (!fs.existsSync(info_plist_path)) {
+            console.error(info_plist_path + " file not found.");
+            process.exit(1);
+        }
         
-        // TODO: get the app_identifier from the app_path
-        // TODO: get the device from --devicetypeid
+        bplist.parseFile(info_plist_path, function(err, obj) {
+          if (err) {
+              throw err;
+          }
+
+          app_identifier = obj[0].CFBundleIdentifier;
+          argv = args.args;
         
-        simctl(wait_for_debugger, device, app_identifier, argv)
+          // TODO: get the deviceid from --devicetypeid
+          // simctl.list needs to return the stdout data in JSON format
+          // --devicetypeid is a string in the form "devicetype, runtime_version"
+          // simctl.list({ devicetypes: true}) returns list of device types in the form of "devicename (devicetype)"
+          // from this, you can get the devicename from the devicetype
+          // simctl.list({ devices: true}) returns list of devices in the form of "devicename, (deviceid) (bootstate)". These are listed in sections "iOS runtime_version"
+          // From:
+          // --devicetypeid --> devicetype, runtime_version
+          // devicetype --> devicename
+          // devicename, runtime_version -> deviceid
+          
+          //simctl.launch(wait_for_debugger, deviceid, app_identifier, argv)
+        });
     },
     
     start : function(args) {
