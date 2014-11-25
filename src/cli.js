@@ -37,8 +37,7 @@ var path = require('path'),
 function init() {
     try {
         nopt = require('nopt');
-        var simctl = require('simctl');
-        // TODO: run simctl check_requirements
+        command_lib.init();
     } catch (e) {
         console.error(
             'Please run npm install from this directory:\n\t' +
@@ -70,15 +69,10 @@ function cli(inputArgs) {
 
     // If no inputArgs given, use process.argv.
     inputArgs = inputArgs || process.argv;
-
+    
     init();
 
     var args = nopt(knownOpts, shortHands, inputArgs);
-
-    if (args.version) {
-        console.log( require('../package').version );
-        return;
-    }
 
     process.on('uncaughtException', function(err){
         if (!args.verbose) {
@@ -89,14 +83,19 @@ function cli(inputArgs) {
         process.exit(1);
     });
     
-    // TODO: get cmd from inputArgs
     var cmd = args.argv.remain[0];
-    if (!cmd || !(command_lib[cmd]) ) {
+    
+    // some options do *not* need commands and can be run
+    if (args.help) {
+        help();
+    } else if (args.version) {
+        console.log(require('../package').version);
+    } else if (cmd && command_lib[cmd]) { // command found
+        command_lib[cmd](args);
+    } else {
         help();
         process.exit(1);
     }
-    
-    command_lib[cmd](args);
 }
 
 module.exports = cli;

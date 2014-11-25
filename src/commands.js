@@ -24,52 +24,54 @@ THE SOFTWARE.
 
 var path = require('path'),
     help = require('./help'),
-    simctl = require('simctl');
+    simctl;
 
 var command_lib = {
     
+    init : function() {
+        if (!simctl) {
+            simctl = require('simctl');
+        }
+        var output = simctl.check_prerequisites();
+        if (output.code !== 0) {
+            console.error(output.output);
+            process.exit(2);
+        }
+    },
+    
     showsdks : function(args) {
-        // TODO:
-        console.log("TODO: showsdks");
-        /* Legacy:
-Simulator SDK Roots:
-'iOS 7.0' (7.0)
-	/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.0.sdk
-'iOS 8.1' (8.1)
-	/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk
-'iOS 7.1' (7.1)
-	/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk        */
+        var options = { 'runtimes' : true };
+        simctl.list(options);
     },
     
     showdevicetypes : function(args) {
-        // TODO:
-        console.log("TODO: showdevicetypes");
-        
-        /* Legacy:
-com.apple.CoreSimulator.SimDeviceType.iPhone-4s, 8.1
-com.apple.CoreSimulator.SimDeviceType.iPhone-5, 8.1
-com.apple.CoreSimulator.SimDeviceType.iPhone-5s, 8.1
-com.apple.CoreSimulator.SimDeviceType.iPhone-6-Plus, 8.1
-com.apple.CoreSimulator.SimDeviceType.iPhone-6, 8.1
-com.apple.CoreSimulator.SimDeviceType.iPad-2, 8.1
-com.apple.CoreSimulator.SimDeviceType.iPad-Retina, 8.1
-com.apple.CoreSimulator.SimDeviceType.iPad-Air, 8.1
-com.apple.CoreSimulator.SimDeviceType.Resizable-iPhone, 8.1
-com.apple.CoreSimulator.SimDeviceType.Resizable-iPad, 8.1        
-        */
+        var options = { 'devicetypes': true };
+        simctl.list(options);
     },
     
     launch : function(args) {
-        // TODO:
+        var wait_for_debugger = false,
+            device = null,
+            app_identifier = null,
+            argv = [],
+            app_path = null;
+
         if (args.argv.remain.length < 2) {
             help();
             process.exit(1);
         }
-        console.log("TODO: launch");
+        
+        app_path = args.argv.remain[1];
+        argv = args.args;
+        
+        // TODO: get the app_identifier from the app_path
+        // TODO: get the device from --devicetypeid
+        
+        simctl(wait_for_debugger, device, app_identifier, argv)
     },
     
     start : function(args) {
-        // TODO:
+        // TODO: launch without app
         console.log("TODO: start");
     }
 }

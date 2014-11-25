@@ -24,7 +24,7 @@
   "author": "Shazron Abdullah",
   "license": "MIT",
   "dependencies": {
-      "simctl": "^0.0.2",
+      "simctl": "^0.0.3",
       "nopt": "1.0.9"
   }
 }
