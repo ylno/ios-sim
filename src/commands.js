@@ -38,9 +38,13 @@ function processDeviceTypeId(devicetypeid) {
         runtime : null
     };
     
+    var arr = [];
+    if (devicetypeid) {
+        arr = devicetypeid.split(',');
+    }
+    
     // get the deviceid from --devicetypeid
     // --devicetypeid is a string in the form "devicetype, runtime_version" (optional: runtime_version)
-    var arr = devicetypeid.split(',');
     if (arr.length < 1) {
       console.error('--devicetypeid was not specified.');
       process.exit(1);
