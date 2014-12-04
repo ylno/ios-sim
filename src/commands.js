@@ -187,9 +187,10 @@ var command_lib = {
             var device = processDeviceTypeId(args.devicetypeid);
             
             // so now we have the deviceid, we can proceed
-            simctl.extensions.start(device.name);
+            simctl.extensions.start(device.id);
             simctl.install(device.id, app_path);
             simctl.launch(wait_for_debugger, device.id, app_identifier, argv);
+            simctl.extensions.log(device.id, args.log);
         });
     },
     
