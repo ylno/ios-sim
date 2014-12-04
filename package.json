@@ -1,6 +1,6 @@
 {
   "name": "ios-sim",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "preferGlobal": "true",
   "description": "launch iOS apps into the iOS Simulator from the command line (Xcode 6.0+)",
   "main": "ios-sim",
@@ -24,7 +24,7 @@
   "author": "Shazron Abdullah",
   "license": "MIT",
   "dependencies": {
-      "simctl": "^0.0.5",
+      "simctl": "^0.0.6",
       "nopt": "1.0.9",
       "bplist-parser" : "^0.0.6"
   }
