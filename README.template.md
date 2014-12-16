@@ -82,7 +82,7 @@ Make sure you enable Developer Mode on your machine:
 
 Make sure multiple instances of launchd_sim are not running:
     
-    $ killall launchd_sim
+    $ sudo ps -A | grep -e "launchd_sim" -e "simulator" -i | grep -v grep | awk '{print $1}' | xargs kill -9
     
 Development
 -----------
