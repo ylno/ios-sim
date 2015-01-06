@@ -331,7 +331,8 @@ static void ChildSignal(int arg) {
 
 
 - (void)createStdioFIFO:(NSFileHandle **)fileHandle ofType:(NSString *)type atPath:(NSString **)path {
-  *path = [NSString stringWithFormat:@"%@/ios-sim-%@-pipe-%d", NSTemporaryDirectory(), type, (int)time(NULL)];
+  NSString *filename = [NSString stringWithFormat:@"ios-sim-%@-pipe-%d", type, (int)time(NULL)];
+  *path = [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
   if (mkfifo([*path UTF8String], S_IRUSR | S_IWUSR) == -1) {
     nsprintf(@"Unable to create %@ named pipe `%@'", type, *path);
     exit(EXIT_FAILURE);
@@ -365,6 +366,22 @@ static void ChildSignal(int arg) {
 - (BOOL) version:(NSString*)versionA isAtLeastVersion:(NSString*)versionB 
 {
     return ([versionA compare:versionB options:NSNumericSearch] != NSOrderedAscending);
+}
+
+// Given a filesystem path, creates all intermediate directories up to but not
+// including the final path component.
+- (void)createContainingDirectoryOrDie:(NSString *)path
+{
+  NSString* containingDirectory = [path stringByDeletingLastPathComponent];
+  NSError *error = nil;
+  [[NSFileManager defaultManager] createDirectoryAtPath:containingDirectory
+                          withIntermediateDirectories:YES
+                                           attributes:nil
+                                                error:&error];
+  if (error != nil) {
+    nsprintf(@"Unable to create directory `%@': %@", NSTemporaryDirectory(), error);
+    exit(EXIT_FAILURE);
+  }
 }
 
 - (int)launchApp:(NSString *)path withFamily:(NSString *)family
@@ -447,8 +464,12 @@ static void ChildSignal(int arg) {
     // Create symbolic links in the data directory that points at the real stdout/stderr paths.
     if ([self version:config.simulatedSystemRoot.sdkVersion isAtLeastVersion:@"8.0"]) {
       NSString* dataPath = config.device.dataPath;
-      [[NSFileManager defaultManager] createSymbolicLinkAtPath:[dataPath stringByAppendingPathComponent:stdoutPath] withDestinationPath:stdoutPath error:NULL];
-      [[NSFileManager defaultManager] createSymbolicLinkAtPath:[dataPath stringByAppendingPathComponent:stderrPath] withDestinationPath:stderrPath error:NULL];
+      NSString* stdoutLinkPath = [dataPath stringByAppendingPathComponent:stdoutPath];
+      [self createContainingDirectoryOrDie:stdoutLinkPath];
+      [[NSFileManager defaultManager] createSymbolicLinkAtPath:stdoutLinkPath withDestinationPath:stdoutPath error:NULL];
+      NSString* stderrLinkPath = [dataPath stringByAppendingPathComponent:stderrPath];
+      [self createContainingDirectoryOrDie:stderrLinkPath];
+      [[NSFileManager defaultManager] createSymbolicLinkAtPath:stderrLinkPath withDestinationPath:stderrPath error:NULL];
     }
   } else {
     // Xcode5 or older
