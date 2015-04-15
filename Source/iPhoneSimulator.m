@@ -22,6 +22,7 @@ NSString *deviceIpad = @"iPad";
 NSString *deviceIpadRetina = @"iPad Retina";
 NSString *deviceIpadRetina_64bit = @"iPad Retina (64-bit)";
 
+NSString* deviceTypeIdPrefix = @"com.apple.CoreSimulator.SimDeviceType.";
 NSString* deviceTypeIdIphone4s = @"com.apple.CoreSimulator.SimDeviceType.iPhone-4s";
 NSString* deviceTypeIdIphone5 = @"com.apple.CoreSimulator.SimDeviceType.iPhone-5";
 NSString* deviceTypeIdIphone5s = @"com.apple.CoreSimulator.SimDeviceType.iPhone-5s";
@@ -699,6 +700,9 @@ static void ChildSignal(int arg) {
       } else if (strcmp(argv[i], "--devicetypeid") == 0) {
           i++;
           deviceTypeId = [NSString stringWithUTF8String:argv[i]];
+          if (![deviceTypeId containsString:deviceTypeIdPrefix]) {
+              deviceTypeId = [deviceTypeIdPrefix stringByAppendingString:deviceTypeId];
+          }
       } else if (strcmp(argv[i], "--setenv") == 0) {
         i++;
         NSArray *parts = [[NSString stringWithUTF8String:argv[i]] componentsSeparatedByString:@"="];
