@@ -195,8 +195,8 @@ var command_lib = {
         for (var deviceName in druntimes) {
             var runtimes = druntimes[ deviceName ];
             runtimes.forEach(function(runtime){
-                // remove "iOS" prefix in runtime
-                console.log(util.format("%s, %s", name_id_map[ deviceName ], runtime.replace(/^iOS /, '')));
+                // remove "iOS" prefix in runtime, remove prefix "com.apple.CoreSimulator.SimDeviceType." in id
+                console.log(util.format("%s, %s", name_id_map[ deviceName ].replace(/^com.apple.CoreSimulator.SimDeviceType./, ''), runtime.replace(/^iOS /, '')));
             });
         }
     },
