@@ -29,6 +29,50 @@ var path = require('path'),
     simctl,
     bplist;
     
+function findFirstAvailableDevice(list) {
+    /*
+        // Example result:
+        {
+            name : 'iPhone 6',
+            id : 'A1193D97-F5EE-468D-9DBA-786F403766E6',
+            runtime : 'iOS 8.3'
+        }
+    */
+    
+    // the object to return
+    var ret_obj = {
+        name : null,
+        id : null,
+        runtime : null
+    };
+    
+    var available_runtimes = {};
+    
+    list.runtimes.forEach(function(runtime) {
+        if (runtime.available) {
+            available_runtimes[ runtime.name ] = true;
+        }
+    });
+    
+    
+    list.devices.some(function(deviceGroup) {
+        deviceGroup.devices.some(function(device){
+            if (available_runtimes[deviceGroup.runtime]) {
+                ret_obj = {
+                    name : device.name,
+                    id : device.id,
+                    runtime : deviceGroup.runtime
+                };
+                return true;
+            }
+            return false;
+        });
+        return false;
+    });
+    
+    return ret_obj;
+}
+    
 function findRuntimesGroupByDeviceProperty(list, deviceProperty, availableOnly) {
     /*
         // Example result:
@@ -82,7 +126,15 @@ function findAvailableRuntime(list, device_name) {
     return druntime.sort().pop();
 }
 
-function processDeviceTypeId(devicetypeid) {
+function getDeviceFromDeviceTypeId(devicetypeid) {
+    /*
+        // Example result:
+        {
+            name : 'iPhone 6',
+            id : 'A1193D97-F5EE-468D-9DBA-786F403766E6',
+            runtime : 'iOS 8.3'
+        }
+    */
     
     // the object to return
     var ret_obj = {
@@ -91,6 +143,9 @@ function processDeviceTypeId(devicetypeid) {
         runtime : null
     };
     
+    var options = { 'silent': true };
+    var list = simctl.list(options).json;
+    
     var arr = [];
     if (devicetypeid) {
         arr = devicetypeid.split(',');
@@ -98,14 +153,16 @@ function processDeviceTypeId(devicetypeid) {
     
     // get the devicetype from --devicetypeid
     // --devicetypeid is a string in the form "devicetype, runtime_version" (optional: runtime_version)
+    var devicetype = null;
     if (arr.length < 1) {
-      console.error('--devicetypeid was not specified.');
-      process.exit(1);
-    }
-
-    var devicetype = arr[0].trim();
-    if (arr.length > 1) {
-        ret_obj.runtime = arr[1].trim();
+      var dv = findFirstAvailableDevice(list);
+      console.error(util.format('--devicetypeid was not specified, using first available device: %s.', dv.name));
+      return dv;
+    } else {
+        devicetype = arr[0].trim();
+        if (arr.length > 1) {
+            ret_obj.runtime = arr[1].trim();
+        }
     }
     
     // check whether devicetype has the "com.apple.CoreSimulator.SimDeviceType." prefix, if not, add it
@@ -115,9 +172,6 @@ function processDeviceTypeId(devicetypeid) {
     }
     
     // now find the devicename from the devicetype
-    var options = { 'silent': true };
-    var list = simctl.list(options).json;
-    
     var devicename_found = list.devicetypes.some(function(deviceGroup) {
         if (deviceGroup.id === devicetype) {
             ret_obj.name = deviceGroup.name;
@@ -237,7 +291,7 @@ var command_lib = {
 
             // get the deviceid from --devicetypeid
             // --devicetypeid is a string in the form "devicetype, runtime_version" (optional: runtime_version)
-            var device = processDeviceTypeId(args.devicetypeid);
+            var device = getDeviceFromDeviceTypeId(args.devicetypeid);
             
             // so now we have the deviceid, we can proceed
             simctl.extensions.start(device.id);
@@ -256,11 +310,11 @@ var command_lib = {
     start : function(args) {
         var device = {};
         try  {
-            device = processDeviceTypeId(args.devicetypeid);
+            device = getDeviceFromDeviceTypeId(args.devicetypeid);
         } catch (e) {
-            // do nothing
+            console.error(e);
         }
-        
+
         simctl.extensions.start(device.id);
     }
 }
