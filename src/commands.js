@@ -28,7 +28,53 @@ var path = require('path'),
     util = require('util'),
     simctl,
     bplist;
+    
+function findRuntimesGroupByDeviceName(list, availableOnly) {
+    var runtimes = {};
+    var available_runtimes = {};
+    
+    for (var i=0; i < list.runtimes.length; ++i) {
+        if (list.runtimes[i].available) {
+            available_runtimes[ list.runtimes[i].name ] = true;
+        }
+    }
+    
+    for (var i=0; i < list.devices.length; ++i) {
+        for (var j=0; j < list.devices[i].devices.length; ++j) {
+            var dname = list.devices[i].devices[j].name;
+            if (!runtimes[dname]) {
+                runtimes[dname] = [];
+            }
+            var rname = list.devices[i].runtime;
+            if (availableOnly) {
+                if (available_runtimes[rname]) {
+                    runtimes[dname].push(rname);
+                }
+            } else {
+                runtimes[dname].push(rname);
+            }
+        }
+    }
+    
+    return runtimes;
+}
 
+function findAvailableRuntime(list, device_name) {
+
+    var all_druntimes = findRuntimesGroupByDeviceName(list, true);
+    var druntime = all_druntimes[device_name];
+    var runtime_found = druntime && druntime.length > 0;
+
+    if (!runtime_found) {
+        console.error(util.format('No available runtimes could be found for "%s".', device_name));
+        process.exit(1);
+    }
+    
+    // return most modern runtime (assume sorted)
+    var latest_runtime = druntime[ druntime.length -1 ];
+    
+    return latest_runtime;
+}
 
 function processDeviceTypeId(devicetypeid) {
     // the object to return
@@ -72,38 +118,14 @@ function processDeviceTypeId(devicetypeid) {
       process.exit(1);
     }
     
-    // if runtime_version was not specified, we use a default. Use first available
-    var check_runtime_availability = true;
-    
+    // if runtime_version was not specified, we use a default. Use first available that has the device
     if (!ret_obj.runtime) {
-        for (var i=0; i < list.runtimes.length; ++i) {
-            if (list.runtimes[i].available) {
-                ret_obj.runtime = list.runtimes[i].name;
-                check_runtime_availability = false;
-                break;
-            }
-        }
+        ret_obj.runtime = findAvailableRuntime(list, ret_obj.name);
     }
     
     // prepend iOS to runtime version, if necessary
     if (ret_obj.runtime.indexOf('iOS') === -1) {
         ret_obj.runtime = util.format('iOS %s', ret_obj.runtime);
-    }
-
-    var runtime_found = !check_runtime_availability;
-    
-    if (check_runtime_availability) {
-        for (var i=0; i < list.runtimes.length; ++i) {
-            if (list.runtimes[i].name === ret_obj.runtime && list.runtimes[i].available) {
-                runtime_found = true;
-                break;
-            }
-        }
-    }
-    
-    if (!runtime_found) {
-        console.error(util.format('Runtime "%s" could not be found, or is not available.', ret_obj.runtime));
-        process.exit(1);
     }
     
     // now find the deviceid
