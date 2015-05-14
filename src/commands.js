@@ -108,6 +108,12 @@ function processDeviceTypeId(devicetypeid) {
         ret_obj.runtime = arr[1].trim();
     }
     
+    // check whether devicetype has the "com.apple.CoreSimulator.SimDeviceType." prefix, if not, add it
+    var prefix = 'com.apple.CoreSimulator.SimDeviceType.';
+    if (devicetype.indexOf(prefix) != 0) {
+        devicetype = prefix + devicetype;
+    }
+    
     // now find the devicename from the devicetype
     var options = { 'silent': true };
     var list = simctl.list(options).json;
