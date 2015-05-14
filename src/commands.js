@@ -29,39 +29,47 @@ var path = require('path'),
     simctl,
     bplist;
     
-function findRuntimesGroupByDeviceName(list, availableOnly) {
+function findRuntimesGroupByDeviceProperty(list, deviceProperty, availableOnly) {
+    /*
+        // Example result:
+        {
+            "iPhone 6" : [ "iOS 8.2", "iOS 8.3"],
+            "iPhone 6 Plus" : [ "iOS 8.2", "iOS 8.3"]
+        } 
+    */
+    
     var runtimes = {};
     var available_runtimes = {};
     
-    for (var i=0; i < list.runtimes.length; ++i) {
-        if (list.runtimes[i].available) {
-            available_runtimes[ list.runtimes[i].name ] = true;
+    list.runtimes.forEach(function(runtime) {
+        if (runtime.available) {
+            available_runtimes[ runtime.name ] = true;
         }
-    }
+    });
     
-    for (var i=0; i < list.devices.length; ++i) {
-        for (var j=0; j < list.devices[i].devices.length; ++j) {
-            var dname = list.devices[i].devices[j].name;
-            if (!runtimes[dname]) {
-                runtimes[dname] = [];
+    list.devices.forEach(function(deviceGroup) {
+        deviceGroup.devices.forEach(function(device){
+            var devicePropertyValue = device[deviceProperty];
+            
+            if (!runtimes[devicePropertyValue]) {
+                runtimes[devicePropertyValue] = [];
             }
-            var rname = list.devices[i].runtime;
             if (availableOnly) {
-                if (available_runtimes[rname]) {
-                    runtimes[dname].push(rname);
+                if (available_runtimes[deviceGroup.runtime]) {
+                    runtimes[devicePropertyValue].push(deviceGroup.runtime);
                 }
             } else {
-                runtimes[dname].push(rname);
+                runtimes[devicePropertyValue].push(deviceGroup.runtime);
             }
-        }
-    }
+        });
+    });
     
     return runtimes;
 }
 
 function findAvailableRuntime(list, device_name) {
 
-    var all_druntimes = findRuntimesGroupByDeviceName(list, true);
+    var all_druntimes = findRuntimesGroupByDeviceProperty(list, "name", true);
     var druntime = all_druntimes[device_name];
     var runtime_found = druntime && druntime.length > 0;
 
@@ -70,13 +78,12 @@ function findAvailableRuntime(list, device_name) {
         process.exit(1);
     }
     
-    // return most modern runtime (assume sorted)
-    var latest_runtime = druntime[ druntime.length -1 ];
-    
-    return latest_runtime;
+    // return most modern runtime
+    return druntime.sort().pop();
 }
 
 function processDeviceTypeId(devicetypeid) {
+    
     // the object to return
     var ret_obj = {
         name : null,
@@ -89,7 +96,7 @@ function processDeviceTypeId(devicetypeid) {
         arr = devicetypeid.split(',');
     }
     
-    // get the deviceid from --devicetypeid
+    // get the devicetype from --devicetypeid
     // --devicetypeid is a string in the form "devicetype, runtime_version" (optional: runtime_version)
     if (arr.length < 1) {
       console.error('--devicetypeid was not specified.');
@@ -97,7 +104,6 @@ function processDeviceTypeId(devicetypeid) {
     }
 
     var devicetype = arr[0].trim();
-    
     if (arr.length > 1) {
         ret_obj.runtime = arr[1].trim();
     }
@@ -106,14 +112,17 @@ function processDeviceTypeId(devicetypeid) {
     var options = { 'silent': true };
     var list = simctl.list(options).json;
     
-    for (var i=0; i < list.devicetypes.length; ++i) {
-        if (list.devicetypes[i].id === devicetype) {
-            ret_obj.name = list.devicetypes[i].name;
+    var devicename_found = list.devicetypes.some(function(deviceGroup) {
+        if (deviceGroup.id === devicetype) {
+            ret_obj.name = deviceGroup.name;
+            return true;
         }
-    }
+        
+        return false;
+    });
     
     // device name not found, exit
-    if (!ret_obj.name) {
+    if (!devicename_found) {
       console.error(util.format('Device type "%s" could not be found.', devicetype));
       process.exit(1);
     }
@@ -128,21 +137,22 @@ function processDeviceTypeId(devicetypeid) {
         ret_obj.runtime = util.format('iOS %s', ret_obj.runtime);
     }
     
-    // now find the deviceid
-    var deviceid;
-    for (var i=0; i < list.devices.length; ++i) {
-        if (list.devices[i].runtime === ret_obj.runtime) { // found the runtime, now find the actual device matching devicename
-            var devlist = list.devices[i].devices;
-            for (var j=0; j < devlist.length; ++j) {
-                if (devlist[j].name === ret_obj.name) {
-                    ret_obj.id = devlist[j].id;
+    // now find the deviceid (by runtime and devicename)
+    var deviceid_found = list.devices.some(function(deviceGroup) {
+        if (deviceGroup.runtime === ret_obj.runtime) { // found the runtime, now find the actual device matching devicename
+            return deviceGroup.devices.some(function(device) {
+                if (device.name === ret_obj.name) {
+                    ret_obj.id = device.id;
+                    return true;
                 }
-            }
+                return false;
+            });
         }
-    }
+        return false;
+    });
     
-    if (!ret_obj.id) {
-        console.error(util.format('Device id for device "%s" and runtime "%s" could not be found, or is not available.', ret_obj.name, ret_obj.runtime));
+    if (!deviceid_found) {
+        console.error(util.format('Device id for device name "%s" and runtime "%s" could not be found, or is not available.', ret_obj.name, ret_obj.runtime));
         process.exit(1);
     }
     
@@ -172,8 +182,23 @@ var command_lib = {
     },
     
     showdevicetypes : function(args) {
-        var options = { 'devicetypes': true };
-        simctl.list(options);
+        var options = { silent: true };
+        var list = simctl.list(options).json;
+        
+        var druntimes = findRuntimesGroupByDeviceProperty(list, "name", true);
+        var name_id_map = {};
+        
+        list.devicetypes.forEach(function(device) {
+            name_id_map[ device.name ] = device.id;
+        });
+        
+        for (var deviceName in druntimes) {
+            var runtimes = druntimes[ deviceName ];
+            runtimes.forEach(function(runtime){
+                // remove "iOS" prefix in runtime
+                console.log(util.format("%s, %s", name_id_map[ deviceName ], runtime.replace(/^iOS /, '')));
+            });
+        }
     },
     
     launch : function(args) {
