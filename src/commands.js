@@ -244,6 +244,9 @@ var command_lib = {
             simctl.install(device.id, app_path);
             simctl.launch(wait_for_debugger, device.id, app_identifier, argv);
             simctl.extensions.log(device.id, args.log);
+            if (args.log) {
+                console.log(util.format("logPath: %s", path.resolve(args.log)));
+            }
             if (args.exit) {
                 process.exit(0);
             }
