@@ -32,16 +32,22 @@ Commands:
 Options:
   --version                       Print the version of ios-sim
   --help                          Show this help text
-  --verbose                       Set the output level to verbose
   --exit                          Exit after startup
-  --env <environment file path>   A plist file containing environment key-value pairs that should be set
-  --setenv NAME=VALUE             Set an environment variable
   --log <log file path>           The path where log of the app running in the Simulator will be redirected to
-  --timeout <seconds>             The timeout time to wait for a response from the Simulator. Default value: 30 seconds
-  --args <...>                    All following arguments will be passed on to the application
   --devicetypeid <device type>    The id of the device type that should be simulated (Xcode6+). Use 'showdevicetypes' to list devices.
                                   e.g "com.apple.CoreSimulator.SimDeviceType.Resizable-iPhone6, 8.0"
 ```
+
+Unsupported arguments from ios-sim 3.x
+--------
+
+    --verbose                       Set the output level to verbose
+    --env <environment file path>   A plist file containing environment key-value pairs that should be set
+    --setenv NAME=VALUE             Set an environment variable
+    --timeout <seconds>             The timeout time to wait for a response from the Simulator. Default value: 30 seconds
+    --args <...>                    All following arguments will be passed on to the application
+
+These are in the [backlog](https://github.com/phonegap/ios-sim/issues?utf8=✓&q=is%3Aopen+label%3A4.x+label%3Afeature-request)
 
 Installation
 ------------
@@ -52,8 +58,8 @@ With node.js (at least 0.10.20):
 
 Download an archive:
 
-    $ curl -L https://github.com/phonegap/ios-sim/zipball/3.0.0 -o ios-sim-3.0.0.zip
-    $ unzip ios-sim-3.0.0.zip
+    $ curl -L https://github.com/phonegap/ios-sim/zipball/4.1.0 -o ios-sim-4.1.0.zip
+    $ unzip ios-sim-4.1.0.zip
 
 Or from a git clone:
 
@@ -64,13 +70,13 @@ Troubleshooting
 ------------
 
 Make sure you enable Developer Mode on your machine:
-    
+
     $ DevToolsSecurity -enable
 
 Make sure multiple instances of launchd_sim are not running:
-    
+
     $ killall launchd_sim
-    
+
 License
 -------
 
