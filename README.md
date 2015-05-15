@@ -12,7 +12,7 @@ Features
 
 See the `--help` option for more info.
 
-The unimplemented options below are in the [backlog](https://github.com/phonegap/ios-sim/issues?utf8=✓&q=is%3Aopen+label%3A4.x+label%3Afeature-request)
+The unimplemented options below are in the [backlog](https://github.com/phonegap/ios-sim/milestones/ios-sim%204.2.0)
 
 Usage
 -----
