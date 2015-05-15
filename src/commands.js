@@ -237,8 +237,16 @@ var command_lib = {
     },
     
     showsdks : function(args) {
-        var options = { 'runtimes' : true };
-        simctl.list(options);
+        var options = { silent: true, runtimes: true };
+        var list = simctl.list(options).json;
+        
+        console.log("Simulator SDK Roots:");
+        list.runtimes.forEach(function(runtime) {
+            if (runtime.available) {
+                console.log(util.format("'%s' (%s)", runtime.name, runtime.build));
+                console.log(util.format("\t(unknown)"));
+            }
+        });
     },
     
     showdevicetypes : function(args) {
