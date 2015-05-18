@@ -17,6 +17,15 @@ Features
 
 See the `--help` option for more info.
 
+Roadmap
+-------
+
+See our [milestones](https://github.com/phonegap/ios-sim/milestones).
+
+Significant changes: 
+
+4.x will be a pure node.js release. Uses the [simctl](https://www.npmjs.com/package/simctl) wrapper to control the iOS Simulator.
+
 Usage
 -----
 
