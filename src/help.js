@@ -1,3 +1,4 @@
+/*
 The MIT License (MIT)
 
 Copyright (c) 2014 Shazron Abdullah
@@ -19,3 +20,22 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+*/
+
+var fs = require('fs'),
+    path = require('path');
+
+function help() {
+    var docdir = path.join(__dirname, '..', 'doc');
+    var helpfile = path.join(docdir, 'help.txt');
+    
+    if (fs.existsSync(helpfile)) {
+        var s = fs.readFileSync(helpfile).toString('utf8');
+        console.log(s);
+    } else {
+        console.log("Help file missing.");
+    }
+};
+
+module.exports = help;
+
