@@ -54,6 +54,8 @@ Options:
   --args <...>                    All following arguments will be passed on to the application
   --devicetypeid <device type>    The id of the device type that should be simulated (Xcode6+). Use 'showdevicetypes' to list devices.
                                   e.g "com.apple.CoreSimulator.SimDeviceType.Resizable-iPhone6, 8.0"
+  --no-deprecations               Suppress deprecation notices.
+                                  
 DEPRECATED in 3.x, use devicetypeid instead:
   --sdk <sdkversion>              The iOS SDK version to run the application on (defaults to the latest)
   --family <device family>        The device type that should be simulated (defaults to `iphone')

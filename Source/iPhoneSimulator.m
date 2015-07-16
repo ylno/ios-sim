@@ -200,6 +200,8 @@ NSString* FindDeveloperDir() {
   fprintf(stderr, "  --args <...>                    All following arguments will be passed on to the application\n");
   fprintf(stderr, "  --devicetypeid <device type>    The id of the device type that should be simulated (Xcode6+). Use 'showdevicetypes' to list devices.\n");
   fprintf(stderr, "                                  e.g \"com.apple.CoreSimulator.SimDeviceType.Resizable-iPhone6, 8.0\"\n");
+  fprintf(stderr, "  --no-deprecations               Suppress deprecation notices.\n");
+  fprintf(stderr, "\n");
   fprintf(stderr, "DEPRECATED in 3.x, use devicetypeid instead:\n");
   fprintf(stderr, "  --sdk <sdkversion>              The iOS SDK version to run the application on (defaults to the latest)\n");
   fprintf(stderr, "  --family <device family>        The device type that should be simulated (defaults to `iphone')\n");
@@ -209,7 +211,9 @@ NSString* FindDeveloperDir() {
 }
 
 - (void) printDeprecation:(char*)option {
-    fprintf(stderr, "Usage of '%s' is deprecated in 3.x. Use --devicetypeid instead.\n", option);
+    if (!noDeprecations) {
+        fprintf(stderr, "Usage of '%s' is deprecated in 3.x. Use --devicetypeid instead.\n", option);
+    }
 }
 
 
@@ -611,6 +615,7 @@ static void ChildSignal(int arg) {
   alreadyPrintedData = NO;
   startOnly = strcmp(argv[1], "start") == 0;
   deviceTypeId = nil;
+  noDeprecations = NO;
 
   NSString* developerDir = FindDeveloperDir();
   if (!developerDir) {
@@ -661,6 +666,8 @@ static void ChildSignal(int arg) {
         verbose = YES;
       } else if (strcmp(argv[i], "--exit") == 0) {
         exitOnStartup = YES;
+      } else if (strcmp(argv[i], "--no-deprecations") == 0) {
+        noDeprecations = YES;
       } else if (strcmp(argv[i], "--debug") == 0) {
         shouldStartDebugger = YES;
       } else if (strcmp(argv[i], "--use-gdb") == 0) {

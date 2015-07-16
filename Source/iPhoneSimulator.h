@@ -23,6 +23,7 @@
   BOOL retinaDevice;
   BOOL tallDevice;
   BOOL is64BitDevice;
+  BOOL noDeprecations;
   NSString *deviceTypeId;
 }
 
