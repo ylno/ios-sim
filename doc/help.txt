@@ -5,7 +5,7 @@ Commands:
   showdevicetypes                 List the available device types
   launch <application path>       Launch the application at the specified path on the iOS Simulator
   start                           Launch iOS Simulator without an app
-  install                         Install the application at the specified path on the iOS Simulator without launching the app
+  install <application path>      Install the application at the specified path on the iOS Simulator without launching the app
 
 Options:
   --version                       Print the version of ios-sim
