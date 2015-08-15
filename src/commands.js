@@ -314,6 +314,52 @@ var command_lib = {
             }
         });
     },
+
+    install : function(args) {
+        var wait_for_debugger = false,
+            app_identifier,
+            argv,
+            app_path,
+            info_plist_path;
+
+        if (args.argv.remain.length < 2) {
+            help();
+            process.exit(1);
+        }
+        
+        app_path = args.argv.remain[1];
+        info_plist_path = path.join(app_path,'Info.plist');
+        if (!fs.existsSync(info_plist_path)) {
+            console.error(info_plist_path + " file not found.");
+            process.exit(1);
+        }
+        
+        bplist.parseFile(info_plist_path, function(err, obj) {
+          
+            if (err) {
+              throw err;
+            }
+
+            app_identifier = obj[0].CFBundleIdentifier;
+            argv = args.args || [];
+
+            // get the deviceid from --devicetypeid
+            // --devicetypeid is a string in the form "devicetype, runtime_version" (optional: runtime_version)
+            var device = getDeviceFromDeviceTypeId(args.devicetypeid);
+            
+            // so now we have the deviceid, we can proceed
+            simctl.extensions.start(device.id);
+            simctl.install(device.id, app_path);
+            
+            simctl.extensions.log(device.id, args.log);
+            if (args.log) {
+                console.log(util.format("logPath: %s", path.resolve(args.log)));
+            }
+            if (args.exit) {
+                process.exit(0);
+            }
+        });
+    },
     
     start : function(args) {
         var device = {};
