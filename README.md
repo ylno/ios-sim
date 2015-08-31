@@ -57,22 +57,29 @@ Usage
 Installation
 ------------
 
-With node.js (at least 0.10.20):
+Choose one of the following installation methods.
+
+### Node JS
+
+Install using node.js (at least 0.10.20):
 
     $ npm install ios-sim -g
 
-Download an archive:
+### Zip
 
-    $ curl -L https://github.com/phonegap/ios-sim/zipball/4.1.1 -o ios-sim-4.1.1.zip
-    $ unzip ios-sim-4.1.1.zip
+Download a zip file:
 
-Or from a git clone:
+    $ curl -L https://github.com/phonegap/ios-sim/archive/master.zip -o ios-sim.zip
+    $ unzip ios-sim.zip
+
+### Git
+
+Download using git clone:
 
     $ git clone git://github.com/phonegap/ios-sim.git
 
-
 Troubleshooting
-------------
+---------------
 
 Make sure you enable Developer Mode on your machine:
 
