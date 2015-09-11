@@ -25,10 +25,8 @@ THE SOFTWARE.
 var path = require('path'),
     fs = require('fs'),
     help = require('./help'),
-    lib = require('./lib');
-    util = require('util'),
-    simctl,
-    bplist;
+    lib = require('./lib'),
+    util = require('util');
     
 var command_lib = {
     
