@@ -1,10 +1,10 @@
 {
   "name": "ios-sim",
-  "version": "4.1.1",
+  "version": "5.0.0",
   "os" : [ "darwin" ],
   "preferGlobal": "true",
   "description": "launch iOS apps into the iOS Simulator from the command line (Xcode 6.0+)",
-  "main": "ios-sim",
+  "main": "ios-sim.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/phonegap/ios-sim"
