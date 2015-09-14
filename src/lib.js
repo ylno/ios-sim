@@ -249,6 +249,28 @@ var lib = {
         });
     },
     
+    getdevicetypes : function(args) {
+        var options = { silent: true };
+        var list = simctl.list(options).json;
+        
+        var druntimes = findRuntimesGroupByDeviceProperty(list, "name", true);
+        var name_id_map = {};
+        
+        list.devicetypes.forEach(function(device) {
+            name_id_map[ device.name ] = device.id;
+        });
+        
+        var list = [];
+        for (var deviceName in druntimes) {
+            var runtimes = druntimes[ deviceName ];
+            runtimes.forEach(function(runtime){
+                // remove "iOS" prefix in runtime, remove prefix "com.apple.CoreSimulator.SimDeviceType." in id
+                list.push(util.format("%s, %s", name_id_map[ deviceName ].replace(/^com.apple.CoreSimulator.SimDeviceType./, ''), runtime.replace(/^iOS /, '')));
+            });
+        }
+        return list;
+    },
+    
     showdevicetypes : function(args) {
         var options = { silent: true };
         var list = simctl.list(options).json;
