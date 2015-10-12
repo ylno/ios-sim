@@ -334,7 +334,7 @@ var lib = {
         });
     },
 
-    install : function(app_path, info_plist_path, devicetypeid, log, exit) {
+    install : function(app_path, devicetypeid, log, exit) {
         var wait_for_debugger = false,
             info_plist_path,
             app_identifier;
