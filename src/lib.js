@@ -318,19 +318,19 @@ var lib = {
         bplist.parseFile(info_plist_path, function(err, obj) {
           
             if (err) {
-				// try to see if a regular plist parser will work
-		        if (!plist) {
-		            plist = require('plist');
-		        }
-				obj = plist.parse(fs.readFileSync(info_plist_path, 'utf8'));
-				if (obj) {
-				  app_identifier = obj.CFBundleIdentifier;
-				} else {
-				  throw err;
-				}
+                // try to see if a regular plist parser will work
+                if (!plist) {
+                    plist = require('plist');
+                }
+                obj = plist.parse(fs.readFileSync(info_plist_path, 'utf8'));
+                if (obj) {
+                  app_identifier = obj.CFBundleIdentifier;
+                } else {
+                  throw err;
+                }
             } else {
-           		app_identifier = obj[0].CFBundleIdentifier;
-			}
+                app_identifier = obj[0].CFBundleIdentifier;
+            }
 
              argv = argv || [];
 
