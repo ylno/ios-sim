@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/0kw833771uu622fs?svg=true)](https://ci.appveyor.com/project/shazron/ios-sim)
+
 ios-sim
 =======
 
