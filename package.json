@@ -24,9 +24,16 @@
   "author": "Shazron Abdullah",
   "license": "MIT",
   "dependencies": {
-      "plist": "^1.2.0",
-      "simctl": "^0.0.9",
-      "nopt": "1.0.9",
-      "bplist-parser" : "^0.0.6"
-  }
+    "plist": "^1.2.0",
+    "simctl": "^0.0.9",
+    "nopt": "1.0.9",
+    "bplist-parser": "^0.0.6"
+  },
+  "devDependencies": {
+    "jshint": "^2.9.1"
+  },
+  "scripts": {
+      "test": "npm run jshint",
+      "jshint": "jshint src ./ios-sim.js"
+  }  
 }
