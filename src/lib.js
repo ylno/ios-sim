@@ -27,8 +27,8 @@ var path = require('path'),
     help = require('./help'),
     util = require('util'),
     simctl,
-	bplist,
-	plist;
+    bplist,
+    plist;
     
 function findFirstAvailableDevice(list) {
     /*
