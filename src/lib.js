@@ -168,7 +168,7 @@ function getDeviceFromDeviceTypeId(devicetypeid) {
     
     // check whether devicetype has the "com.apple.CoreSimulator.SimDeviceType." prefix, if not, add it
     var prefix = 'com.apple.CoreSimulator.SimDeviceType.';
-    if (devicetype.indexOf(prefix) != 0) {
+    if (devicetype.indexOf(prefix) !== 0) {
         devicetype = prefix + devicetype;
     }
     
@@ -261,18 +261,19 @@ var lib = {
             name_id_map[ device.name ] = device.id;
         });
         
-        var list = [];
+        list = [];
+        var remove = function(runtime){
+            // remove "iOS" prefix in runtime, remove prefix "com.apple.CoreSimulator.SimDeviceType." in id
+            list.push(util.format("%s, %s", name_id_map[ deviceName ].replace(/^com.apple.CoreSimulator.SimDeviceType./, ''), runtime.replace(/^iOS /, '')));
+        };
+
         for (var deviceName in druntimes) {
             var runtimes = druntimes[ deviceName ];
             
             if (!(deviceName in name_id_map)) {
                 continue;
             }
-            
-            runtimes.forEach(function(runtime){
-                // remove "iOS" prefix in runtime, remove prefix "com.apple.CoreSimulator.SimDeviceType." in id
-                list.push(util.format("%s, %s", name_id_map[ deviceName ].replace(/^com.apple.CoreSimulator.SimDeviceType./, ''), runtime.replace(/^iOS /, '')));
-            });
+            runtimes.forEach(remove);
         }
         return list;
     },
@@ -288,17 +289,18 @@ var lib = {
             name_id_map[ device.name ] = device.id;
         });
         
+        var remove = function(runtime){
+                // remove "iOS" prefix in runtime, remove prefix "com.apple.CoreSimulator.SimDeviceType." in id
+                console.log(util.format("%s, %s", name_id_map[ deviceName ].replace(/^com.apple.CoreSimulator.SimDeviceType./, ''), runtime.replace(/^iOS /, '')));
+        };
+        
         for (var deviceName in druntimes) {
             var runtimes = druntimes[ deviceName ];
             
             if (!(deviceName in name_id_map)) {
                 continue;
             }
-            
-            runtimes.forEach(function(runtime){
-                // remove "iOS" prefix in runtime, remove prefix "com.apple.CoreSimulator.SimDeviceType." in id
-                console.log(util.format("%s, %s", name_id_map[ deviceName ].replace(/^com.apple.CoreSimulator.SimDeviceType./, ''), runtime.replace(/^iOS /, '')));
-            });
+            runtimes.forEach(remove);
         }
     },
     
@@ -397,7 +399,7 @@ var lib = {
 
         simctl.extensions.start(device.id);
     }
-}
+};
 
 module.exports = lib;
 
