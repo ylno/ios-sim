@@ -34,8 +34,10 @@
     "jshint": "^2.9.1"
   },
   "scripts": {
-    "test": "npm run jshint && npm run jscs",
+    "test": "",
+        "posttest": "npm run jshint",
     "jshint": "jshint src ./ios-sim.js",
+        "postjshint": "npm run jscs",
     "jscs": "jscs src ./ios-sim.js"
   }
 }
