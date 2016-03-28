@@ -30,14 +30,16 @@
     "bplist-parser": "^0.0.6"
   },
   "devDependencies": {
+    "jasmine-node": "^1.14.5",
     "jscs": "^2.11.0",
     "jshint": "^2.9.1"
   },
   "scripts": {
-    "test": "",
-        "posttest": "npm run jshint",
+    "test": "npm run jasmine",
+    "posttest": "npm run jshint",
     "jshint": "jshint src ./ios-sim.js",
-        "postjshint": "npm run jscs",
-    "jscs": "jscs src ./ios-sim.js"
+    "postjshint": "npm run jscs",
+    "jscs": "jscs src ./ios-sim.js",
+    "jasmine": "jasmine-node --captureExceptions --color spec"
   }
 }
