@@ -223,6 +223,44 @@ function getDeviceFromDeviceTypeId(devicetypeid) {
     return ret_obj;
 }
 
+// Parses array of KEY=Value strings into map of strings
+// If fixsymctl == true, updates variables for correct usage with simctl
+function parseEnvironmentVariables(envVariables, fixsymctl) {
+    envVariables = envVariables || [];
+    fixsymctl = typeof fixsymctl != 'undefined' ? fixsymctl : true;
+
+    var envMap = {};
+    envVariables.forEach(function(variable) {
+        var envPair = variable.split('=', 2);
+        if (envPair.length == 2) {
+            var key = envPair[0];
+            var value = envPair[1];
+            if (fixsymctl) {
+                key = 'SIMCTL_CHILD_' + key;
+            }
+            envMap[ key ] = value;
+        }
+    });
+    return envMap;
+}
+
+// Injects specified environt variables to the process and then runs action
+// returns environment variables back to original state after action completes
+function withInjectedEnvironmentVariablesToProcess(process, envVariables, action) {
+    var oldVariables = util._extend({}, process.env);
+
+    // Inject additional environment variables to process
+    for (var key in envVariables) {
+        var value = envVariables[key];
+        process.env[key] = value;
+    }
+
+    action();
+
+    // restore old envs
+    process.env = oldVariables;
+}
+
 var lib = {
 
     init: function() {
@@ -313,7 +351,7 @@ var lib = {
     },
     //jscs:enable disallowUnusedParams
 
-    launch: function(app_path, devicetypeid, log, exit, argv) {
+    launch: function(app_path, devicetypeid, log, exit, setenv, argv) {
         var wait_for_debugger = false;
         var info_plist_path;
         var app_identifier;
@@ -342,22 +380,27 @@ var lib = {
             }
 
             argv = argv || [];
+            setenv = setenv || [];
 
-            // get the deviceid from --devicetypeid
-            // --devicetypeid is a string in the form "devicetype, runtime_version" (optional: runtime_version)
-            var device = getDeviceFromDeviceTypeId(devicetypeid);
+            var environmentVariables = parseEnvironmentVariables(setenv);
 
-            // so now we have the deviceid, we can proceed
-            simctl.extensions.start(device.id);
-            simctl.install(device.id, app_path);
-            simctl.launch(wait_for_debugger, device.id, app_identifier, argv);
-            simctl.extensions.log(device.id, log);
-            if (log) {
-                console.log(util.format('logPath: %s', path.resolve(log)));
-            }
-            if (exit) {
-                process.exit(0);
-            }
+            withInjectedEnvironmentVariablesToProcess(process, environmentVariables, function() {
+                // get the deviceid from --devicetypeid
+                // --devicetypeid is a string in the form "devicetype, runtime_version" (optional: runtime_version)
+                var device = getDeviceFromDeviceTypeId(devicetypeid);
+
+                // so now we have the deviceid, we can proceed
+                simctl.extensions.start(device.id);
+                simctl.install(device.id, app_path);
+                simctl.launch(wait_for_debugger, device.id, app_identifier, argv);
+                simctl.extensions.log(device.id, log);
+                if (log) {
+                    console.log(util.format('logPath: %s', path.resolve(log)));
+                }
+                if (exit) {
+                    process.exit(0);
+                }
+            });
         });
     },
 
@@ -407,7 +450,10 @@ var lib = {
         }
 
         simctl.extensions.start(device.id);
-    }
+    },
+
+    _parseEnvironmentVariables: parseEnvironmentVariables
+
 };
 
 module.exports = lib;
