@@ -296,7 +296,7 @@ var lib = {
 
     //jscs:disable disallowUnusedParams
     showdevicetypes: function(args) {
-        this.getdevicetypes().forEach(function(device){
+        this.getdevicetypes().forEach(function(device) {
             console.log(device);
         });
     },
