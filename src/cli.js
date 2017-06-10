@@ -57,7 +57,7 @@ function cli(inputArgs) {
             'use-gdb': Boolean,
             'uuid': String,
             'env': String,
-            'setenv': String,
+            'setenv': Array,
             'stdout': path,
             'stderr': path,
             'timeout': Number,
