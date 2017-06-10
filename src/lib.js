@@ -51,24 +51,21 @@ function findFirstAvailableDevice(list) {
     var available_runtimes = {};
 
     list.runtimes.forEach(function(runtime) {
-        if (runtime.available) {
-            available_runtimes[ runtime.name ] = true;
-        }
+        available_runtimes[ runtime.name ] = (runtime.availability === '(available)');
     });
 
-    list.devices.some(function(deviceGroup) {
-        deviceGroup.devices.some(function(device) {
-            if (available_runtimes[deviceGroup.runtime]) {
+    Object.keys(list.devices).some(function(deviceGroup) {
+        return list.devices[deviceGroup].some(function(device) {
+            if (available_runtimes[deviceGroup]) {
                 ret_obj = {
                     name: device.name,
-                    id: device.id,
-                    runtime: deviceGroup.runtime
+                    id: device.udid,
+                    runtime: deviceGroup
                 };
                 return true;
             }
             return false;
         });
-        return false;
     });
 
     return ret_obj;
@@ -87,24 +84,22 @@ function findRuntimesGroupByDeviceProperty(list, deviceProperty, availableOnly) 
     var available_runtimes = {};
 
     list.runtimes.forEach(function(runtime) {
-        if (runtime.available) {
-            available_runtimes[ runtime.name ] = true;
-        }
+        available_runtimes[ runtime.name ] = (runtime.availability === '(available)');
     });
 
-    list.devices.forEach(function(deviceGroup) {
-        deviceGroup.devices.forEach(function(device) {
+    Object.keys(list.devices).forEach(function(deviceGroup) {
+        list.devices[deviceGroup].forEach(function(device) {
             var devicePropertyValue = device[deviceProperty];
 
             if (!runtimes[devicePropertyValue]) {
                 runtimes[devicePropertyValue] = [];
             }
             if (availableOnly) {
-                if (available_runtimes[deviceGroup.runtime]) {
-                    runtimes[devicePropertyValue].push(deviceGroup.runtime);
+                if (available_runtimes[deviceGroup]) {
+                    runtimes[devicePropertyValue].push(deviceGroup);
                 }
             } else {
-                runtimes[devicePropertyValue].push(deviceGroup.runtime);
+                runtimes[devicePropertyValue].push(deviceGroup);
             }
         });
     });
@@ -115,7 +110,7 @@ function findRuntimesGroupByDeviceProperty(list, deviceProperty, availableOnly) 
 function findAvailableRuntime(list, device_name) {
 
     var all_druntimes = findRuntimesGroupByDeviceProperty(list, 'name', true);
-    var druntime = all_druntimes[device_name];
+    var druntime = all_druntimes[ filterDeviceName(device_name) ];
     var runtime_found = druntime && druntime.length > 0;
 
     if (!runtime_found) {
@@ -174,7 +169,7 @@ function getDeviceFromDeviceTypeId(devicetypeid) {
 
     // now find the devicename from the devicetype
     var devicename_found = list.devicetypes.some(function(deviceGroup) {
-        if (deviceGroup.id === devicetype) {
+        if (deviceGroup.identifier === devicetype) {
             ret_obj.name = deviceGroup.name;
             return true;
         }
@@ -194,17 +189,17 @@ function getDeviceFromDeviceTypeId(devicetypeid) {
     }
 
     // prepend iOS to runtime version, if necessary
-    if (ret_obj.runtime.indexOf('iOS') === -1) {
+    if (ret_obj.runtime.indexOf('OS') === -1) {
         ret_obj.runtime = util.format('iOS %s', ret_obj.runtime);
     }
 
     // now find the deviceid (by runtime and devicename)
-    var deviceid_found = list.devices.some(function(deviceGroup) {
+    var deviceid_found = Object.keys(list.devices).some(function(deviceGroup) {
         // found the runtime, now find the actual device matching devicename
-        if (deviceGroup.runtime === ret_obj.runtime) {
-            return deviceGroup.devices.some(function(device) {
-                if (device.name === ret_obj.name) {
-                    ret_obj.id = device.id;
+        if (deviceGroup === ret_obj.runtime) {
+            return list.devices[deviceGroup].some(function(device) {
+                if (filterDeviceName(device.name) === filterDeviceName(ret_obj.name)) {
+                    ret_obj.id = device.udid;
                     return true;
                 }
                 return false;
@@ -261,6 +256,15 @@ function withInjectedEnvironmentVariablesToProcess(process, envVariables, action
     process.env = oldVariables;
 }
 
+// replace hyphens in iPad Pro name which differ in 'Device Types' and 'Devices'
+function filterDeviceName(deviceName) {
+    // replace hyphens in iPad Pro name which differ in 'Device Types' and 'Devices'
+    if (deviceName.indexOf('iPad Pro') === 0) {
+        return deviceName.replace(/\-/g, ' ').trim();
+    }
+    return deviceName;
+}
+
 var lib = {
 
     init: function() {
@@ -285,8 +289,8 @@ var lib = {
 
         console.log('Simulator SDK Roots:');
         list.runtimes.forEach(function(runtime) {
-            if (runtime.available) {
-                console.log(util.format('"%s" (%s)', runtime.name, runtime.build));
+            if (runtime.availability === '(available)') {
+                console.log(util.format('"%s" (%s)', runtime.name, runtime.buildversion));
                 console.log(util.format('\t(unknown)'));
             }
         });
@@ -302,22 +306,30 @@ var lib = {
         var name_id_map = {};
 
         list.devicetypes.forEach(function(device) {
-            name_id_map[ device.name ] = device.id;
+            name_id_map[ filterDeviceName(device.name) ] = device.identifier;
         });
 
         list = [];
-        var remove = function(runtime) {
+        var remove = function(devicename, runtime) {
             // remove "iOS" prefix in runtime, remove prefix "com.apple.CoreSimulator.SimDeviceType." in id
-            list.push(util.format('%s, %s', name_id_map[ deviceName ].replace(/^com.apple.CoreSimulator.SimDeviceType./, ''), runtime.replace(/^iOS /, '')));
+            list.push(util.format('%s, %s', name_id_map[ devicename ].replace(/^com.apple.CoreSimulator.SimDeviceType./, ''), runtime.replace(/^iOS /, '')));
+        };
+
+        var cur = function(devicename) {
+            return function(runtime) {
+                remove(devicename, runtime);
+            };
         };
 
         for (var deviceName in druntimes) {
             var runtimes = druntimes[ deviceName ];
+            var dname = filterDeviceName(deviceName);
 
-            if (!(deviceName in name_id_map)) {
+            if (!(dname in name_id_map)) {
                 continue;
             }
-            runtimes.forEach(remove);
+
+            runtimes.forEach(cur(dname));
         }
         return list;
     },
@@ -325,29 +337,9 @@ var lib = {
 
     //jscs:disable disallowUnusedParams
     showdevicetypes: function(args) {
-        var options = { silent: true };
-        var list = simctl.list(options).json;
-
-        var druntimes = findRuntimesGroupByDeviceProperty(list, 'name', true);
-        var name_id_map = {};
-
-        list.devicetypes.forEach(function(device) {
-            name_id_map[ device.name ] = device.id;
+        this.getdevicetypes().forEach(function(device) {
+            console.log(device);
         });
-
-        var remove = function(runtime) {
-            // remove "iOS" prefix in runtime, remove prefix "com.apple.CoreSimulator.SimDeviceType." in id
-            console.log(util.format('%s, %s', name_id_map[ deviceName ].replace(/^com.apple.CoreSimulator.SimDeviceType./, ''), runtime.replace(/^iOS /, '')));
-        };
-
-        for (var deviceName in druntimes) {
-            var runtimes = druntimes[ deviceName ];
-
-            if (!(deviceName in name_id_map)) {
-                continue;
-            }
-            runtimes.forEach(remove);
-        }
     },
     //jscs:enable disallowUnusedParams
 
