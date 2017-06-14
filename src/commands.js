@@ -31,7 +31,7 @@ var path = require('path'),
 var command_lib = {
 
     init: function() {
-        lib.init();
+        return lib.init();
     },
 
     //jscs:disable disallowUnusedParams
