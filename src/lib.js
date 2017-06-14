@@ -274,12 +274,13 @@ var lib = {
         var output = simctl.check_prerequisites();
         if (output.code !== 0) {
             console.error(output.output);
-            process.exit(2);
         }
 
         if (!bplist) {
             bplist = require('bplist-parser');
         }
+
+        return output.code;
     },
 
     //jscs:disable disallowUnusedParams
