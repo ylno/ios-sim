@@ -368,9 +368,6 @@ var lib = {
             var dname = filterDeviceName(deviceName);
 
             if (!(dname in name_id_map)) {
-
-                console.log('----> DNAME', dname);
-                console.log('----> RUNTIMES', runtimes);
                 continue;
             }
 
