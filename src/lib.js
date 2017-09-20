@@ -327,13 +327,15 @@ var lib = {
         var options = { silent: true, runtimes: true };
         var list = simctl.list(options).json;
 
-        console.log('Simulator SDK Roots:');
+        var output = 'Simulator SDK Roots:\n';
         list.runtimes.forEach(function(runtime) {
             if (runtime.availability === '(available)') {
-                console.log(util.format('"%s" (%s)', runtime.name, runtime.buildversion));
-                console.log(util.format('\t(unknown)'));
+                output += util.format('"%s" (%s)\n', runtime.name, runtime.buildversion);
+                output += util.format('\t(unknown)\n');
             }
         });
+
+        return output;
     },
     //jscs:enable disallowUnusedParams
 
@@ -378,9 +380,12 @@ var lib = {
 
     //jscs:disable disallowUnusedParams
     showdevicetypes: function(args) {
+        var output = '';
         this.getdevicetypes().forEach(function(device) {
-            console.log(device);
+            output += util.format('%s\n', device);
         });
+
+        return output;
     },
     //jscs:enable disallowUnusedParams
 
@@ -475,13 +480,7 @@ var lib = {
     },
 
     start: function(devicetypeid) {
-        var device = {};
-        try {
-            device = getDeviceFromDeviceTypeId(devicetypeid);
-        } catch (e) {
-            console.error(e);
-        }
-
+        var device = getDeviceFromDeviceTypeId(devicetypeid);
         simctl.extensions.start(device.id);
     },
 
