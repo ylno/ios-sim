@@ -362,7 +362,7 @@ var lib = {
                 continue;
             }
 
-            runtimes.forEach(cur(dname));
+            runtimes.forEach(cur(deviceName));
         }
         return list;
     },
