@@ -6,7 +6,7 @@
   "main": "ios-sim.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/phonegap/ios-sim"
+    "url": "https://github.com/ios-control/ios-sim"
   },
   "engines": {
     "node": ">=4"
