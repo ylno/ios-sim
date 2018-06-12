@@ -24,10 +24,10 @@
   "author": "Shazron Abdullah",
   "license": "MIT",
   "dependencies": {
-    "plist": "^1.2.0",
-    "simctl": "^1.1.1",
+    "bplist-parser": "^0.0.6",
     "nopt": "1.0.9",
-    "bplist-parser": "^0.0.6"
+    "plist": "^3.0.1",
+    "simctl": "^1.1.1"
   },
   "devDependencies": {
     "jasmine": "~2.6.0",
