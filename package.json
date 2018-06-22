@@ -1,6 +1,6 @@
 {
   "name": "ios-sim",
-  "version": "6.1.2",
+  "version": "6.1.3-dev",
   "preferGlobal": "true",
   "description": "launch iOS apps into the iOS Simulator from the command line (Xcode 8.0+)",
   "main": "ios-sim.js",
