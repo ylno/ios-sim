@@ -17,14 +17,13 @@
     under the License.
 */
 
-describe('cli end-to-end', function() {
+describe('cli end-to-end', function () {
+  beforeEach(function () {
+  })
 
-    beforeEach(function() {
-    });
+  afterEach(function () {
+  })
 
-    afterEach(function() {
-    });
-
-    // it('', function(done) {
-    // });
-});
+  it('dummy test - remove', function () {
+  })
+})

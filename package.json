@@ -30,19 +30,37 @@
     "simctl": "^2"
   },
   "devDependencies": {
-    "eslint": "^4.19.1",
-    "eslint-config-semistandard": "^12.0.1",
-    "eslint-config-standard": "^11.0.0",
+    "acorn": "^6.1.1",
+    "eslint": "^5.15.1",
+    "eslint-config-standard": "^12.0.0",
     "eslint-plugin-import": "^2.12.0",
-    "eslint-plugin-node": "^6.0.1",
-    "eslint-plugin-promise": "^3.8.0",
-    "eslint-plugin-standard": "^3.1.0",
-    "jasmine": "~2.6.0"
+    "eslint-plugin-jest": "^22.3.0",
+    "eslint-plugin-node": "^8.0.1",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "jest": "^24.1.0",
+    "jest-junit": "^6.3.0"
   },
   "scripts": {
-    "eslint": "eslint *.js src spec",
-    "test": "npm run jasmine",
-    "posttest": "npm run eslint",
-    "jasmine": "jasmine --config=spec/jasmine.json"
+    "eslint": "eslint *.js src test",
+    "test": "jest --ci",
+    "posttest": "npm run eslint"
+  },
+  "jest": {
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/*.js"
+    ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/jest.setup.js"
+    ],
+    "reporters": [
+      "default",
+      "jest-junit"
+    ],
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": [
+      "./test/jest.setup.js"
+    ]
   }
 }
