@@ -53,7 +53,7 @@ let command_lib = {
     let app_path
 
     if (args.argv.remain.length < 2) {
-      help()
+      console.log(help())
       process.exit(1)
     }
 
@@ -66,7 +66,7 @@ let command_lib = {
     let app_path
 
     if (args.argv.remain.length < 2) {
-      help()
+      console.log(help())
       process.exit(1)
     }
 

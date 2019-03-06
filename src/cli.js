@@ -90,13 +90,13 @@ function cli (inputArgs) {
 
   // some options do *not* need commands and can be run
   if (args.help) {
-    help()
+    console.log(help())
   } else if (args.version) {
     console.log(require('../package').version)
   } else if (cmd && command_lib[cmd]) { // command found
     command_lib[cmd](args)
   } else {
-    help()
+    console.log(help())
     process.exit(1)
   }
 }

@@ -19,5 +19,8 @@
       "camelcase": 0
   },
   "globals": {
+      "fixtureFile": true,
+      "fixtureJson": true,
+      "fakeFileSystem": true
   }
 }

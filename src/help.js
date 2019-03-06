@@ -31,9 +31,9 @@ function help () {
 
   if (fs.existsSync(helpfile)) {
     let s = fs.readFileSync(helpfile).toString('utf8')
-    console.log(s)
+    return s
   } else {
-    console.log('Help file missing.')
+    return 'Help file missing.'
   }
 }
 
