@@ -1,10 +1,5 @@
 node_modules
-build
-*.swp
 .DS_Store
-*.xcworkspace
-xcuserdata
-node_modules
 /coverage
 /junit.xml
 /oclif.manifest.json
