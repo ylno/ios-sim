@@ -4,9 +4,7 @@
 [![Build Status](https://travis-ci.org/ios-control/ios-sim.svg?branch=master)](https://travis-ci.org/ios-control/ios-sim)
 
 ios-sim
-=======
-ios-sim
-======================
+==========
 
 
 <!-- toc -->
@@ -59,7 +57,7 @@ OPTIONS
   --debug=debug                    Debug level output
 ```
 
-_See code: [src/commands/install.js](https://github.com/ios-control/ios-sim/blob/v9.0.0-dev/src/commands/install.js)_
+_See code: [src/commands/install.js](https://github.com/ios-control/ios-sim/blob/master/src/commands/install.js)_
 
 ## `ios-sim launch APPLICATIONPATH`
 
@@ -89,7 +87,7 @@ OPTIONS
   --debug=debug                    Debug level output
 ```
 
-_See code: [src/commands/launch.js](https://github.com/ios-control/ios-sim/blob/v9.0.0-dev/src/commands/launch.js)_
+_See code: [src/commands/launch.js](https://github.com/ios-control/ios-sim/blob/master/src/commands/launch.js)_
 
 ## `ios-sim showdevicetypes`
 
@@ -106,7 +104,7 @@ OPTIONS
   --debug=debug  Debug level output
 ```
 
-_See code: [src/commands/showdevicetypes.js](https://github.com/ios-control/ios-sim/blob/v9.0.0-dev/src/commands/showdevicetypes.js)_
+_See code: [src/commands/showdevicetypes.js](https://github.com/ios-control/ios-sim/blob/master/src/commands/showdevicetypes.js)_
 
 ## `ios-sim showsdks`
 
@@ -123,7 +121,7 @@ OPTIONS
   --debug=debug  Debug level output
 ```
 
-_See code: [src/commands/showsdks.js](https://github.com/ios-control/ios-sim/blob/v9.0.0-dev/src/commands/showsdks.js)_
+_See code: [src/commands/showsdks.js](https://github.com/ios-control/ios-sim/blob/master/src/commands/showsdks.js)_
 
 ## `ios-sim start`
 
@@ -146,5 +144,5 @@ OPTIONS
   --debug=debug                    Debug level output
 ```
 
-_See code: [src/commands/start.js](https://github.com/ios-control/ios-sim/blob/v9.0.0-dev/src/commands/start.js)_
+_See code: [src/commands/start.js](https://github.com/ios-control/ios-sim/blob/master/src/commands/start.js)_
 <!-- commandsstop -->
