@@ -116,6 +116,8 @@ function findRuntimesGroupByDeviceProperty (list, deviceProperty, availableOnly,
       if (!runtimes[devicePropertyValue]) {
         runtimes[devicePropertyValue] = []
       }
+
+      deviceGroup = fixDeviceGroup(deviceGroup)
       if (availableOnly) {
         if (available_runtimes[deviceGroup]) {
           runtimes[devicePropertyValue].push(deviceGroup)
@@ -317,9 +319,27 @@ function findFirstAvailableDevice (list) {
   return ret_obj
 }
 
+function fixDeviceGroup (deviceGroup) {
+  // looking for format 'com.apple.CoreSimulator.SimRuntime.iOS-12-0'
+  const pattern = /^com\.apple\.CoreSimulator\.SimRuntime\.(([a-zA-Z0-9]+)-(\S+))$/i
+  const match = pattern.exec(deviceGroup)
+
+  if (match) {
+    const [ , , os, version ] = match
+    if (os && version) {
+      return `${os} ${version.replace('-', '.')}`
+    }
+  }
+
+  return deviceGroup
+}
+
 module.exports = {
   getDeviceTypes,
   parseEnvironmentVariables,
   withInjectedEnvironmentVariablesToProcess,
-  getDeviceFromDeviceTypeId
+  getDeviceFromDeviceTypeId,
+  __internal: {
+    fixDeviceGroup
+  }
 }

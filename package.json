@@ -66,9 +66,10 @@
     "stdout-stderr": "^0.1.9"
   },
   "scripts": {
-    "posttest": "eslint src test",
     "test": "npm run unit-tests",
+    "posttest": "npm run eslint",
     "unit-tests": "jest --ci",
+    "eslint": "eslint src test",
     "prepack": "oclif-dev manifest && oclif-dev readme",
     "postpack": "rm -f oclif.manifest.json",
     "version": "oclif-dev readme && git add README.md"
