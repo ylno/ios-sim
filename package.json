@@ -25,7 +25,8 @@
   "license": "Apache-2.0",
   "files": [
     "/oclif.manifest.json",
-    "/src"
+    "/src",
+    "/bin"
   ],
   "oclif": {
     "commands": "./src/commands",
