@@ -243,7 +243,7 @@ function getDeviceFromDeviceTypeId (devicetypeid) {
   // now find the deviceid (by runtime and devicename)
   let deviceid_found = Object.keys(list.devices).some(function (deviceGroup) {
     // found the runtime, now find the actual device matching devicename
-    if (deviceGroup === ret_obj.runtime) {
+    if (deviceGroup === runtimeToDevicegroup(ret_obj.runtime)) {
       return list.devices[deviceGroup].some(function (device) {
         if (filterDeviceName(device.name).toLowerCase() === filterDeviceName(ret_obj.name).toLowerCase()) {
           ret_obj.id = device.udid
@@ -317,6 +317,15 @@ function findFirstAvailableDevice (list) {
   })
 
   return ret_obj
+}
+
+function runtimeToDevicegroup (runtime) {
+  const pattern = /^([a-zA-Z]+)\s([0-9.]+)/i
+  const match = pattern.exec(runtime)
+  if (match) {
+    const [, os, version] = match
+    return 'com.apple.CoreSimulator.SimRuntime.' + os + '-' + version.replace('.', '-')
+  }
 }
 
 function fixDeviceGroup (deviceGroup) {
